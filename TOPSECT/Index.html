@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise For You ❤️</title>
+    <style>
+        /* --- พื้นหลังไล่เฉดสีแบบเคลื่อนไหว --- */
+        body {
+            margin: 0; padding: 20px; min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: 'Sarabun', sans-serif; overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- รูปแบบกล่องหลัก --- */
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px; border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            text-align: center; max-width: 90%; width: 450px; z-index: 10;
+            position: relative;
+        }
+        .hidden { display: none !important; }
+        h1, h2 { color: #ff4d6d; margin-bottom: 15px; }
+        p { color: #555; font-size: 1.1em; line-height: 1.5; }
+        
+        button.btn-main {
+            background-color: #ff4d6d; color: white; border: none;
+            padding: 12px 25px; font-size: 1.1em; border-radius: 50px;
+            cursor: pointer; margin-top: 15px; transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 77, 109, 0.3);
+            width: 100%; /* ปรับปุ่มให้กว้างเต็มกรอบเพื่อความสวยงาม */
+            box-sizing: border-box;
+        }
+        button.btn-main:hover { background-color: #e63950; transform: translateY(-2px); }
+        
+        /* ปุ่มข้าม (สีฟ้า) */
+        button.btn-skip {
+            background-color: #a1c4fd; box-shadow: 0 4px 15px rgba(161, 196, 253, 0.4);
+        }
+        button.btn-skip:hover { background-color: #8bb3f8; }
+
+        input[type="text"] {
+            width: 80%; padding: 12px; font-size: 1em;
+            border: 2px solid #fbc2eb; border-radius: 10px;
+            text-align: center; margin-top: 10px; outline: none;
+        }
+
+        /* --- ด่าน 1: ปุ่มวิ่งหนี --- */
+        #btnNo {
+            background-color: #ccc; box-shadow: none; color: #333;
+            transition: top 0.2s, left 0.2s; width: auto;
+        }
+        .btn-yes { width: auto !important; }
+
+        /* --- ด่าน 3: การ์ดขูด --- */
+        .scratch-container {
+            position: relative; width: 250px; height: 150px; margin: 20px auto;
+            border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .scratch-prize {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffe6ea; display: flex; justify-content: center; align-items: center;
+            font-size: 1.2em; font-weight: bold; color: #ff4d6d; text-align: center; padding: 10px; box-sizing: border-box;
+        }
+        canvas { position: absolute; top: 0; left: 0; cursor: pointer; }
+
+        /* --- ด่าน 4: กล่องสุ่ม --- */
+        .box-container { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+        .mystery-box { font-size: 3em; cursor: pointer; transition: 0.3s; }
+        .mystery-box:hover { transform: scale(1.1) rotate(5deg); }
+        .box-result { margin-top: 15px; display: none; }
+        .box-result img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; }
+        .box-caption { font-weight: bold; color: #ff4d6d; margin-top: 10px; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+
+        /* --- หน้า Gallery --- */
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px; margin: 15px 0; max-height: 280px; overflow-y: auto; padding: 5px;
+        }
+        .gallery-grid img {
+            width: 100%; height: 120px; object-fit: cover;
+            border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        /* แต่ง Scrollbar ของ Gallery ให้ดูมินิมอล */
+        .gallery-grid::-webkit-scrollbar { width: 6px; }
+        .gallery-grid::-webkit-scrollbar-thumb { background: #ffbcbc; border-radius: 10px; }
+
+        /* --- ด่าน 5: ตั๋วเครื่องบิน --- */
+        .ticket {
+            background: #fff; border-radius: 15px; padding: 20px;
+            border: 2px dashed #ff4d6d; position: relative; margin: 20px 0;
+            background-image: radial-gradient(circle at 0 50%, transparent 10px, #fff 11px), radial-gradient(circle at 100% 50%, transparent 10px, #fff 11px);
+            background-size: 51% 100%; background-repeat: no-repeat; background-position: left, right;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .ticket h3 { margin: 0 0 10px 0; color: #333; }
+        .flight-info { display: flex; justify-content: space-between; align-items: center; font-size: 1.5em; font-weight: bold; color: #ff4d6d; }
+        .plane-icon { font-size: 1.2em; color: #a1c4fd; }
+
+        /* --- ด่าน 6: Music Player & Typewriter --- */
+        .music-player {
+            background: #ffffff; border-radius: 24px; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); margin: 20px auto; max-width: 320px;
+        }
+        .player-info { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        .cover-art { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.15); animation: spin 5s linear infinite; animation-play-state: paused; }
+        .cover-art.playing { animation-play-state: running; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .text-info { text-align: left; }
+        .song-title { font-size: 1.1em; font-weight: bold; color: #444; margin: 0 0 4px 0; }
+        .song-artist { font-size: 0.9em; color: #999; margin: 0; }
+        .progress-area { display: flex; align-items: center; gap: 10px; font-size: 0.8em; color: #888; font-weight: bold; margin-bottom: 15px; }
+        .progress-bar-bg { flex-grow: 1; height: 6px; background: #f0f0f0; border-radius: 3px; position: relative; cursor: pointer; }
+        .progress-fill { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: #ff4d6d; border-radius: 3px; }
+        .progress-thumb { position: absolute; top: 50%; right: -6px; transform: translateY(-50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .player-controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
+        .ctrl-btn { background: none; border: none; cursor: pointer; display: flex; justify-content: center; align-items: center; }
+        .ctrl-btn svg { width: 24px; height: 24px; fill: #aaa; transition: 0.2s; }
+        .ctrl-btn:hover svg { fill: #ff4d6d; }
+        .play-pause-btn { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #ddd; background: #fff; transition: 0.2s; }
+        .play-pause-btn svg { width: 20px; height: 20px; fill: #555; }
+        .play-pause-btn:hover { border-color: #ff4d6d; }
+        
+        .typewriter-text {
+            min-height: 80px; font-size: 1.1em; color: #444; line-height: 1.6;
+            margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.6); border-radius: 10px; text-align: center;
+        }
+
+        .heart { position: absolute; bottom: -100px; width: 20px; height: 20px; background: #ff4d6d; transform: rotate(-45deg); animation: fly linear infinite; pointer-events: none; z-index: 99; }
+        .heart::before, .heart::after { content: ''; position: absolute; width: 20px; height: 20px; background: #ff4d6d; border-radius: 50%; }
+        .heart::before { top: -10px; left: 0; }
+        .heart::after { top: 0; left: 10px; }
+        @keyframes fly { 0% { transform: translateY(0) rotate(-45deg) scale(1); opacity: 1; } 100% { transform: translateY(-100vh) rotate(-45deg) scale(0.5); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <audio id="audioPlayer" src="music.mp3"></audio>
+
+    <div class="container" id="step1">
+        <h2>ก่อนจะรับของขวัญ... 🎁</h2>
+        <p>ถามตรงๆ เลยนะ "รักเค้ามั้ย?"</p>
+        <div style="margin-top: 20px;">
+            <button class="btn-main btn-yes" onclick="nextStep(2)">รักมากกกก! ❤️</button>
+            <button class="btn-main btn-yes" id="btnNo" onmouseover="runAway(this)" onclick="runAway(this)">ไม่ค่อยอะ 🙄</button>
+        </div>
+    </div>
+
+    <div class="container hidden" id="step2">
+        <h2>ดีมาก! งั้นมาทดสอบความจำกัน 🤔</h2>
+        <p id="ui-quiz-question">คำถาม?</p>
+        <input type="text" id="answer" placeholder="พิมพ์คำตอบตรงนี้...">
+        <br>
+        <button class="btn-main" onclick="checkAnswer()">ตรวจคำตอบ</button>
+        <p id="errorMsg" style="color: #e63950; font-weight: bold; display: none;"></p>
+    </div>
+
+    <div class="container hidden" id="step3">
+        <h2>รับคูปองลุ้นรางวัล! 🎫</h2>
+        <p>เอานิ้วถูๆ หรือเอาเมาส์ลากเพื่อขูดดูของขวัญเลย!</p>
+        <div class="scratch-container">
+            <div class="scratch-prize" id="ui-prize-text">รางวัล!</div>
+            <canvas id="scratchCanvas" width="250" height="150"></canvas>
+        </div>
+        <button class="btn-main" id="btnNext3" style="display: none;" onclick="nextStep(4)">ไปต่อเลย!</button>
+    </div>
+
+    <div class="container hidden" id="step4">
+        <h2>กล่องสุ่มความทรงจำ 📦</h2>
+        <p>เลือกเปิด 1 กล่องสิ ว่าข้างในมีอะไรซ่อนอยู่</p>
+        <div class="box-container" id="boxes">
+            <div class="mystery-box" onclick="openBox(0)">🎁</div>
+            <div class="mystery-box" onclick="openBox(1)">🎁</div>
+            <div class="mystery-box" onclick="openBox(2)">🎁</div>
+        </div>
+
+        <div class="box-result" id="boxResult">
+            <img id="boxImg" src="" alt="Memory">
+            <p class="box-caption" id="boxCaption"></p>
+            
+            <div class="btn-group">
+                <button class="btn-main" onclick="nextStep('Gallery')">ดูรูปเพิ่มเติม (Gallery) 📸</button>
+                <button class="btn-main btn-skip" onclick="nextStep(5)">ข้ามไปดูเซอร์ไพรส์ต่อไป ⏩</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="stepGallery">
+        <h2>Our Memories 📸</h2>
+        <p>รวมรูปน่ารักๆ ของเราสองคน</p>
+        <div class="gallery-grid" id="ui-gallery-grid">
+            </div>
+        <button class="btn-main" onclick="nextStep(5)">ไปดูเซอร์ไพรส์ชิ้นต่อไปกัน! 🎁</button>
+    </div>
+
+    <div class="container hidden" id="step5">
+        <h2>Tadaaa! 🎉 ของขวัญพิเศษ</h2>
+        <p id="ui-ticket-msg">ข้อความตั๋ว</p>
+        <div class="ticket">
+            <h3>BOARDING PASS 🎫</h3>
+            <div class="flight-info">
+                <span>BKK</span>
+                <span class="plane-icon">✈️</span>
+                <span id="ui-ticket-dest">DEST</span>
+            </div>
+            <p style="font-size: 0.8em; color: #888; margin-top: 10px; text-align: left;">PASSENGER: MY LOVE ❤️<br>SEAT: 14A</p>
+        </div>
+        <button class="btn-main" onclick="startFinale()">กดเพื่อรับคำอวยพรสุดท้าย</button>
+    </div>
+
+    <div class="container hidden" id="step6">
+        <h1 id="ui-final-title">Title</h1>
+        <div class="music-player">
+            <div class="player-info">
+                <img src="cover.jpg" alt="Cover" class="cover-art" id="coverArt">
+                <div class="text-info">
+                    <p class="song-title" id="ui-song-title">ชื่อเพลง</p>
+                    <p class="song-artist" id="ui-song-artist">ศิลปิน</p>
+                </div>
+            </div>
+            <div class="progress-area">
+                <span id="currentTime">00:00</span>
+                <div class="progress-bar-bg" id="progressBar" onclick="seek(event)">
+                    <div class="progress-fill" id="progressFill"><div class="progress-thumb"></div></div>
+                </div>
+                <span id="totalTime">00:00</span>
+            </div>
+            <div class="player-controls">
+                <button class="ctrl-btn" onclick="seekBackward()"><svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z"/></svg></button>
+                <button class="ctrl-btn play-pause-btn" onclick="togglePlay()" id="playBtn">
+                    <svg id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                    <svg id="icon-pause" viewBox="0 0 24 24" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                </button>
+                <button class="ctrl-btn" onclick="seekForward()"><svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
+            </div>
+        </div>
+        <div class="typewriter-text" id="typewriterText"></div>
+    </div>
+
+    <script>
+        /* ==========================================
+           🛠️ โซนตั้งค่า 
+           ========================================== */
+        const CONFIG = {
+            quizQuestion: "เราคบกันวันที่เท่าไหร่เอ่ย? (ใส่แค่ตัวเลข)",
+            quizAnswer: "14", 
+            quizErrorMsg: "ผิดจ้าาา ลองนึกดูดีๆ น้า 😜",
+            scratchPrize: "คูปองเลี้ยงหมูกระทะ 1 มื้อฟรี! 🥓",
+
+            // ตั้งค่ากล่องสุ่ม 3 กล่อง
+            mysteryBoxes: [
+                { img: "photo1.jpg", text: "จำเดตแรกของเราได้มั้ย เขินสุดๆ" },
+                { img: "photo2.jpg", text: "รูปนี้ที่รักน่ารักที่สุดเลยยย" },
+                { img: "photo3.jpg", text: "ผ่านอะไรด้วยกันมาเยอะเลยนะ" }
+            ],
+
+            // 📸 ตั้งค่ารูปภาพในหน้า Gallery (ใส่เพิ่มได้เรื่อยๆ โดยคั่นด้วยเครื่องหมาย , )
+            galleryImages: [
+                "photo1.jpg", 
+                "photo2.jpg", 
+                "photo3.jpg", 
+                "photo4.jpg"
+            ],
+
+            ticketDestination: "TIBET (ทิเบต)",
+            ticketMessage: "แอบเห็นว่าอยากไป... งั้นเตรียมเก็บกระเป๋าไปทริปในฝันด้วยกันนะ!",
+            musicFile: "MP3/MC.mp3",          
+            coverFile: "MP3/BG.jpg", 
+            songTitle: "ต่อจากนี้เพลงรักทุกเพลงจะเป็นของเธอเท่านั้น",
+            songArtist: "No One Else",
+            finalTitle: "Happy Birthday! 🎂",
+            finalMessage: "สุขสันต์วันเกิดนะที่รัก ขอบคุณที่เป็นรอยยิ้มให้กันในทุกๆ วัน ขอให้ปีนี้เป็นปีที่ดีมากๆ และขอให้อยู่ด้วยกันแบบนี้ไปนานๆ เลยนะ รักที่สุดเลยยย 💖"
+        };
+
+        const audio = document.getElementById("audioPlayer");
+        
+        window.onload = function() {
+            document.getElementById("ui-quiz-question").innerHTML = CONFIG.quizQuestion;
+            document.getElementById("errorMsg").innerHTML = CONFIG.quizErrorMsg;
+            document.getElementById("ui-prize-text").innerHTML = CONFIG.scratchPrize;
+            document.getElementById("ui-ticket-dest").innerHTML = CONFIG.ticketDestination;
+            document.getElementById("ui-ticket-msg").innerHTML = CONFIG.ticketMessage;
+            document.getElementById("ui-final-title").innerHTML = CONFIG.finalTitle;
+            
+            audio.src = CONFIG.musicFile;
+            document.getElementById("coverArt").src = CONFIG.coverFile;
+            document.getElementById("ui-song-title").innerHTML = CONFIG.songTitle;
+            document.getElementById("ui-song-artist").innerHTML = CONFIG.songArtist;
+            
+            // สร้างรูปในแกลลอรี่อัตโนมัติ
+            const galleryGrid = document.getElementById("ui-gallery-grid");
+            CONFIG.galleryImages.forEach(imgSrc => {
+                let img = document.createElement("img");
+                img.src = imgSrc;
+                galleryGrid.appendChild(img);
+            });
+
+            initScratchCard();
+        };
+
+        function nextStep(step) {
+            document.querySelectorAll('.container').forEach(el => el.classList.add('hidden'));
+            document.getElementById('step' + step).classList.remove('hidden');
+        }
+
+        function runAway(btn) {
+            const container = document.getElementById("step1");
+            const maxX = container.clientWidth - btn.clientWidth;
+            const maxY = container.clientHeight - btn.clientHeight;
+            btn.style.position = "absolute";
+            btn.style.left = Math.floor(Math.random() * maxX) + "px";
+            btn.style.top = Math.floor(Math.random() * maxY) + "px";
+        }
+
+        function checkAnswer() {
+            let ans = document.getElementById("answer").value.trim();
+            if(ans === CONFIG.quizAnswer) { nextStep(3); } 
+            else { document.getElementById('errorMsg').style.display = 'block'; }
+        }
+
+        function initScratchCard() {
+            const canvas = document.getElementById("scratchCanvas");
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#c0c0c0"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#666"; ctx.font = "20px Sarabun"; ctx.textAlign = "center";
+            ctx.fillText("ขูดดูรางวัลตรงนี้เลย!", canvas.width/2, canvas.height/2 + 5);
+
+            let isDrawing = false; let scratchedPixels = 0;
+            function scratch(e) {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+                ctx.globalCompositeOperation = "destination-out";
+                ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+                scratchedPixels++;
+                if(scratchedPixels > 50) { document.getElementById("btnNext3").style.display = "block"; }
+            }
+            canvas.addEventListener("mousedown", () => isDrawing = true);
+            canvas.addEventListener("mouseup", () => isDrawing = false);
+            canvas.addEventListener("mousemove", scratch);
+            canvas.addEventListener("touchstart", (e) => { isDrawing = true; scratch(e); });
+            canvas.addEventListener("touchend", () => isDrawing = false);
+            canvas.addEventListener("touchmove", (e) => { e.preventDefault(); scratch(e); });
+        }
+
+        function openBox(index) {
+            document.getElementById("boxes").style.display = "none";
+            document.getElementById("boxResult").style.display = "block";
+            document.getElementById("boxImg").src = CONFIG.mysteryBoxes[index].img;
+            document.getElementById("boxCaption").innerHTML = CONFIG.mysteryBoxes[index].text;
+        }
+
+        function startFinale() {
+            nextStep(6); togglePlay(); createHearts();
+            let i = 0; const text = CONFIG.finalMessage;
+            document.getElementById("typewriterText").innerHTML = "";
+            function typeWriter() {
+                if (i < text.length) {
+                    document.getElementById("typewriterText").innerHTML += text.charAt(i);
+                    i++; setTimeout(typeWriter, 60);
+                }
+            }
+            setTimeout(typeWriter, 500);
+        }
+
+        let isPlaying = false;
+        function togglePlay() {
+            if (isPlaying) {
+                audio.pause();
+                document.getElementById('icon-play').style.display = 'block';
+                document.getElementById('icon-pause').style.display = 'none';
+                document.getElementById('coverArt').classList.remove('playing');
+            } else {
+                audio.play();
+                document.getElementById('icon-play').style.display = 'none';
+                document.getElementById('icon-pause').style.display = 'block';
+                document.getElementById('coverArt').classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            if(audio.duration) {
+                document.getElementById('progressFill').style.width = (audio.currentTime / audio.duration) * 100 + "%";
+                document.getElementById('currentTime').innerText = formatTime(audio.currentTime);
+                document.getElementById('totalTime').innerText = formatTime(audio.duration);
+            }
+        });
+        function formatTime(seconds) {
+            let min = Math.floor(seconds / 60); let sec = Math.floor(seconds % 60);
+            return (min < 10 ? "0" + min : min) + ":" + (sec < 10 ? "0" + sec : sec);
+        }
+        function seek(event) { audio.currentTime = (event.offsetX / document.getElementById('progressBar').clientWidth) * audio.duration; }
+        function seekBackward() { audio.currentTime = Math.max(0, audio.currentTime - 10); }
+        function seekForward() { audio.currentTime = Math.min(audio.duration, audio.currentTime + 10); }
+
+        function createHearts() {
+            for (let i = 0; i < 40; i++) {
+                setTimeout(() => {
+                    let heart = document.createElement('div'); heart.className = 'heart';
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    heart.style.opacity = Math.random() * 0.5 + 0.5;
+                    document.body.appendChild(heart);
+                    setTimeout(() => { heart.remove(); }, 6000);
+                }, i * 150); 
+            }
+        }
+    </script>
+</body>
+</html>
